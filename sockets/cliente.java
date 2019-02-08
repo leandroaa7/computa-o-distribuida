@@ -46,7 +46,7 @@ class UDPClient {
       ;
 
       System.out.println("FROM SERVER:" + mensagemRecebida);
-      clientSocket.close();
+      clientSocket.close(); //fechar socket
 
    }
 }

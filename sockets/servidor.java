@@ -12,31 +12,35 @@ package javaapplication1;
 import java.io.*;
 import java.net.*;
 
-class UDPServer
-{
-   public static void main(String args[]) throws Exception
-      {
-        DatagramSocket serverSocket = new DatagramSocket(9000);
-           byte[] receiveData = new byte[1024];
-           byte[] sendData = new byte[1024];
-           while(true)
-              {
-                //receber pacote
-                 DatagramPacket pacoteRecebido = new DatagramPacket(receiveData, receiveData.length);
-                 serverSocket.receive(pacoteRecebido);
+class UDPServer {
+   public static void main(String args[]) throws Exception {
+      DatagramSocket serverSocket = new DatagramSocket(9000);
+      byte[] receiveData = new byte[1024];
+      byte[] sendData = new byte[1024];
+      String capitalizedMessage, mensagemRecebida;
+      DatagramPacket newPacket, receivePacket; // pacote(ou datagrama) a ser enviado e recebido, respectivamente
+      InetAddress IPAddress;
+      int port;
 
-                 String mensagemRecebida = new String( pacoteRecebido.getData());
+      while (true) {
+         /* receber pacote */
+         receivePacket = new DatagramPacket(receiveData, receiveData.length);
+         serverSocket.receive(receivePacket);
 
-                 System.out.println("Foi recebido-> " + mensagemRecebida);
-                 //falta implementar
-                 InetAddress IPAddress = pacoteRecebido.getAddress();//pegar endereco
-                 int port = pacoteRecebido.getPort();
-                 String capitalizedSentence = mensagemRecebida.toUpperCase();
-                 sendData = capitalizedSentence.getBytes();
+         mensagemRecebida = new String(receivePacket.getData());
 
-                 DatagramPacket sendPacket =
-                 new DatagramPacket(sendData, sendData.length, IPAddress, port);
-                 serverSocket.send(sendPacket);
-              }
+         System.out.println("Mensagem Recebida:" + mensagemRecebida);
+
+         /* falta implementar */
+         IPAddress = receivePacket.getAddress();// pegar endereco
+         port = receivePacket.getPort();
+         capitalizedMessage = mensagemRecebida.toUpperCase(); // mensagem recebida em MAIÚSCULO
+         sendData = capitalizedMessage.getBytes();// transformar em bytes
+
+         newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+         serverSocket.send(newPacket); // enviar novo pacote
+
       }
+      // serverSocket.close(); fechar socket
+   }
 }
