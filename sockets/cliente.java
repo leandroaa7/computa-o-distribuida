@@ -1,51 +1,52 @@
 import java.io.*;
 import java.net.*;
 
-class UDPClient
-{
-   public static void main(String args[]) throws Exception
-   {
-     BufferedReader inFromUser =
-        new BufferedReader(new InputStreamReader(System.in));//receber nome
+class UDPClient {
+   public static void main(String args[]) throws Exception {
+      byte[] sendData = new byte[1024];
+      byte[] receiveData = new byte[1024];
+      String userData, saudacao, mensagemRecebida;
+      BufferedReader userInput;
+      DatagramSocket clientSocket;
+      InetAddress IPAddress;
+      DatagramPacket newPacket, receivePacket; // pacote(ou datagrama) a ser enviado e recebido, respectivamente
 
+      userInput = new BufferedReader(new InputStreamReader(System.in));// receber nome
+      userData = userInput.readLine();// ler mensagem digitada no terminal
+      IPAddress = InetAddress.getByName(userData);// input ip
 
-     DatagramSocket clientSocket = new DatagramSocket();
-     //InetAddress IPAddress = InetAddress.getByName("172.16.18.17");
-     byte[] sendData = new byte[1024];
-     byte[] receiveData = new byte[1024];
+      saudacao = "Oi. quer conversar?";
+      sendData = saudacao.getBytes();// transformar em bytes
 
-     String inputUser = inFromUser.readLine();// ler mensagem
+      newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
+      clientSocket = new DatagramSocket();
+      clientSocket.send(newPacket);// enviar mensagem
 
-     InetAddress IPAddress = InetAddress.getByName(inputUser);//input ip
+      /* receber mensagem */
+      receivePacket = new DatagramPacket(receiveData, receiveData.length);
+      clientSocket.receive(receivePacket); // receber pacote
 
-     //sendData = inputUser.getBytes();//transformar em bytes
+      mensagemRecebida = new String(receivePacket.getData());
 
-     String saudacao = "Oi. quer conversar?";
+      while (mensagemRecebida.toUpperCase() != "NAO") {
+         System.out.println("Mensagem Recebida:" + mensagemRecebida);
 
-     sendData= saudacao.getBytes();
+         /* enviar mensagem */
+         userData = userInput.readLine();// ler nova mensagem
+         sendData = userData.getBytes();// transformar em bytes
+         newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
+         clientSocket.send(newPacket);// enviar novo pacote com a mensagem
 
-     DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
+         /* receber mensagem */
+         receivePacket = new DatagramPacket(receiveData, receiveData.length);
+         clientSocket.receive(receivePacket); // receber pacote
 
-     clientSocket.send(sendPacket);//enviar mensagem
+         mensagemRecebida = new String(receivePacket.getData());
+      }
+      ;
 
-     //receber mensagem
-     DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-     clientSocket.receive(receivePacket);
-     String mensagemRecebida = new String(receivePacket.getData());
+      System.out.println("FROM SERVER:" + mensagemRecebida);
+      clientSocket.close();
 
-     while(mensagemRecebida.toUpperCase() != "NAO"){
-       System.out.println("Mensagem Recebida:" + mensagemRecebida);
-       //enviar mensagem
-       inputUser = inFromUser.readLine();// ler mensagem
-       sendData= inputUser.getBytes();
-       sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
-       clientSocket.send(sendPacket);//enviar mensagem
-       //receber mensagem
-        receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
-        mensagemRecebida = new String(receivePacket.getData());
-     }
-     System.out.println("FROM SERVER:" + mensagemRecebida);
-     clientSocket.close();
    }
 }
