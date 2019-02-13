@@ -1,26 +1,59 @@
+
+/**
+ * @author 31616720
+ */
+
 import java.io.*;
 import java.net.*;
 
 class UDPClient {
+   private static String[][] colegaList = { { "Mario", "localhost" }, { "Maria", "localhost" } };
+
+   private static String getIpColega(String colega) {
+      for (int i = 0; i < colegaList.length; i++) {
+         if (colegaList[i][0].equals(colega)) {
+            return colegaList[i][1];
+         }
+      }
+      ;
+      return null;
+   };
+
+   private static void enviarMensagem(String mensagem) {
+      byte[] sendData = new byte[1024];
+      DatagramPacket newPacket;
+
+      sendData = mensagem.getBytes();// transformar em bytes
+
+   }
+
    public static void main(String args[]) throws Exception {
       byte[] sendData = new byte[1024];
       byte[] receiveData = new byte[1024];
-      String userData, saudacao, mensagemRecebida;
+      String colega, ipColega, saudacao, mensagemRecebida;
       BufferedReader userInput;
       DatagramSocket clientSocket;
       InetAddress IPAddress;
       DatagramPacket newPacket, receivePacket; // pacote(ou datagrama) a ser enviado e recebido, respectivamente
 
+      System.out.println("Digite o nome do seu colega:");
       userInput = new BufferedReader(new InputStreamReader(System.in));// receber nome
-      userData = userInput.readLine();// ler mensagem digitada no terminal
-      IPAddress = InetAddress.getByName(userData);// input ip
+      colega = userInput.readLine(); // ler mensagem digitada no terminal
+      ipColega = getIpColega(colega);
+      if (ipColega == null) {
+         throw new Exception("Colega não encontrado");
+      }
+      ;
 
-      saudacao = "Oi. quer conversar?";
+      IPAddress = InetAddress.getByName(ipColega);// input ip
+
+      saudacao = "Oi, aqui é o " + colega + ". Alguma questão?";
       sendData = saudacao.getBytes();// transformar em bytes
 
+      /* enviar mensagem */
       newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
       clientSocket = new DatagramSocket();
-      clientSocket.send(newPacket);// enviar mensagem
+      clientSocket.send(newPacket); // enviar mensagem
 
       /* receber mensagem */
       receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -32,8 +65,8 @@ class UDPClient {
          System.out.println("Mensagem Recebida:" + mensagemRecebida);
 
          /* enviar mensagem */
-         userData = userInput.readLine();// ler nova mensagem
-         sendData = userData.getBytes();// transformar em bytes
+         colega = userInput.readLine();// ler nova mensagem
+         sendData = colega.getBytes();// transformar em bytes
          newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
          clientSocket.send(newPacket);// enviar novo pacote com a mensagem
 
@@ -46,7 +79,7 @@ class UDPClient {
       ;
 
       System.out.println("FROM SERVER:" + mensagemRecebida);
-      clientSocket.close(); //fechar socket
+      clientSocket.close(); // fechar socket
 
    }
 }

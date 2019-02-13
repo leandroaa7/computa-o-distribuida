@@ -1,7 +1,14 @@
 {
-    "configurations": [
+    "configurations": [{
+            "type": "java",
+            "console": "integratedTerminal",
+            "name": "CodeLens (Launch) - UDPServer",
+            "request": "launch",
+            "mainClass": "javaapplication1.UDPServer"
+        },
         {
             "type": "java",
+            "console": "integratedTerminal",
             "name": "CodeLens (Launch) - UDPClient",
             "request": "launch",
             "mainClass": "UDPClient"
