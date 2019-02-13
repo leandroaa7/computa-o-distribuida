@@ -19,41 +19,56 @@ class UDPClient {
       return null;
    };
 
-   private static void enviarMensagem(String mensagem) {
+   private static void enviarMensagem(String ipColega,String mensagem) throws Exception  {
+      InetAddress IPAddress;
       byte[] sendData = new byte[1024];
       DatagramPacket newPacket;
+      DatagramSocket clientSocket;
 
+      IPAddress = InetAddress.getByName(ipColega);// input ip
       sendData = mensagem.getBytes();// transformar em bytes
+      
+      newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
+      clientSocket = new DatagramSocket();
+      clientSocket.send(newPacket); // enviar mensagem
+      clientSocket.close(); // fechar socket
+   };
 
+   private static void receberMensagem(){
+      
    }
 
    public static void main(String args[]) throws Exception {
       byte[] sendData = new byte[1024];
       byte[] receiveData = new byte[1024];
-      String colega, ipColega, saudacao, mensagemRecebida;
+      String colega, ipColega, mensagem, mensagemRecebida;
       BufferedReader userInput;
       DatagramSocket clientSocket;
       InetAddress IPAddress;
       DatagramPacket newPacket, receivePacket; // pacote(ou datagrama) a ser enviado e recebido, respectivamente
 
       System.out.println("Digite o nome do seu colega:");
+      
       userInput = new BufferedReader(new InputStreamReader(System.in));// receber nome
       colega = userInput.readLine(); // ler mensagem digitada no terminal
+      
       ipColega = getIpColega(colega);
       if (ipColega == null) {
          throw new Exception("Colega não encontrado");
       }
       ;
 
-      IPAddress = InetAddress.getByName(ipColega);// input ip
+      //IPAddress = InetAddress.getByName(ipColega);// input ip
 
-      saudacao = "Oi, aqui é o " + colega + ". Alguma questão?";
-      sendData = saudacao.getBytes();// transformar em bytes
+      mensagem = "Oi, aqui é o " + colega + ". Alguma questão?";
+
+      enviarMensagem(ipColega, mensagem);
+      //sendData = mensagem.getBytes();// transformar em bytes
 
       /* enviar mensagem */
-      newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
+      //newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
       clientSocket = new DatagramSocket();
-      clientSocket.send(newPacket); // enviar mensagem
+      //clientSocket.send(newPacket); // enviar mensagem
 
       /* receber mensagem */
       receivePacket = new DatagramPacket(receiveData, receiveData.length);
