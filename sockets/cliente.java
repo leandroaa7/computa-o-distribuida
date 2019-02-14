@@ -9,6 +9,14 @@ import java.net.*;
 class UDPClient {
    private static String[][] colegaList = { { "Mario", "localhost" }, { "Maria", "localhost" } };
 
+   private static String getInputUser() throws Exception {
+      String input;
+      BufferedReader userInput;
+      userInput = new BufferedReader(new InputStreamReader(System.in));// receber nome
+      input = userInput.readLine(); // ler mensagem digitada no terminal
+      return input;
+   };
+
    private static String getIpColega(String colega) {
       for (int i = 0; i < colegaList.length; i++) {
          if (colegaList[i][0].equals(colega)) {
@@ -19,82 +27,80 @@ class UDPClient {
       return null;
    };
 
-   private static void enviarMensagem(String ipColega,String mensagem) throws Exception  {
+   private static DatagramSocket openSocket() throws Exception {
+      DatagramSocket newSocket = new DatagramSocket(9500);
+      return newSocket;
+   };
+
+   private static void closeSocket(DatagramSocket clientSocket) {
+      clientSocket.close();
+   };
+
+   private static void enviarMensagem(DatagramSocket clientSocket, String ipColega, String mensagem) throws Exception {
       InetAddress IPAddress;
       byte[] sendData = new byte[1024];
       DatagramPacket newPacket;
-      DatagramSocket clientSocket;
 
       IPAddress = InetAddress.getByName(ipColega);// input ip
       sendData = mensagem.getBytes();// transformar em bytes
-      
+
       newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
-      clientSocket = new DatagramSocket();
       clientSocket.send(newPacket); // enviar mensagem
-      clientSocket.close(); // fechar socket
+
    };
 
-   private static void receberMensagem(){
-      
-   }
-
-   public static void main(String args[]) throws Exception {
-      byte[] sendData = new byte[1024];
+   private static String receberMensagem(DatagramSocket clientSocket) throws Exception {
       byte[] receiveData = new byte[1024];
-      String colega, ipColega, mensagem, mensagemRecebida;
-      BufferedReader userInput;
-      DatagramSocket clientSocket;
-      InetAddress IPAddress;
-      DatagramPacket newPacket, receivePacket; // pacote(ou datagrama) a ser enviado e recebido, respectivamente
 
-      System.out.println("Digite o nome do seu colega:");
-      
-      userInput = new BufferedReader(new InputStreamReader(System.in));// receber nome
-      colega = userInput.readLine(); // ler mensagem digitada no terminal
-      
-      ipColega = getIpColega(colega);
-      if (ipColega == null) {
-         throw new Exception("Colega não encontrado");
-      }
-      ;
+      DatagramPacket receivePacket; // pacote a ser recebido
+      String mensagemRecebida;
 
-      //IPAddress = InetAddress.getByName(ipColega);// input ip
-
-      mensagem = "Oi, aqui é o " + colega + ". Alguma questão?";
-
-      enviarMensagem(ipColega, mensagem);
-      //sendData = mensagem.getBytes();// transformar em bytes
-
-      /* enviar mensagem */
-      //newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
-      clientSocket = new DatagramSocket();
-      //clientSocket.send(newPacket); // enviar mensagem
-
-      /* receber mensagem */
       receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
       clientSocket.receive(receivePacket); // receber pacote
 
       mensagemRecebida = new String(receivePacket.getData());
 
-      while (mensagemRecebida.toUpperCase() != "NAO") {
-         System.out.println("Mensagem Recebida:" + mensagemRecebida);
+      return mensagemRecebida;
+   };
 
-         /* enviar mensagem */
-         colega = userInput.readLine();// ler nova mensagem
-         sendData = colega.getBytes();// transformar em bytes
-         newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9000);
-         clientSocket.send(newPacket);// enviar novo pacote com a mensagem
+   public static void main(String args[]) throws Exception {
+      String colega, ipColega, mensagem, mensagemRecebida = "";
+      DatagramSocket clientSocket = null;
 
-         /* receber mensagem */
-         receivePacket = new DatagramPacket(receiveData, receiveData.length);
-         clientSocket.receive(receivePacket); // receber pacote
+      while (mensagemRecebida.trim() != "NAO") {
 
-         mensagemRecebida = new String(receivePacket.getData());
+         System.out.println("Digite o nome do seu colega:");
+
+         colega = getInputUser();
+         ipColega = getIpColega(colega);
+
+         if (ipColega == null) {
+            throw new Exception("Colega não encontrado");
+         }
+         ;
+
+         mensagem = "Oi, aqui é o " + colega + ". Alguma questão?";
+
+         clientSocket = openSocket();
+         enviarMensagem(clientSocket, ipColega, mensagem);
+
+         mensagemRecebida = receberMensagem(clientSocket);
+         System.out.println("-" + mensagemRecebida);
+
+         //loopíng da conversa
+         while (mensagemRecebida.trim() != "NAO") {
+            mensagem = getInputUser();
+            enviarMensagem(clientSocket, ipColega, mensagem);
+            mensagemRecebida = receberMensagem(clientSocket);
+            System.out.println("-" + mensagemRecebida);
+         }
+         ;
+
       }
-      ;
 
-      System.out.println("FROM SERVER:" + mensagemRecebida);
-      clientSocket.close(); // fechar socket
+      closeSocket(clientSocket);
 
-   }
-}
+   };
+
+};
