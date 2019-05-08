@@ -11,9 +11,13 @@ class UDPServer {
     private static String hora = "23:30";
     private static InetAddress ipDoMestre;
     private static int portaDoMestre;
+    private static int minhaPorta;
 
     private static DatagramSocket openSocket() throws Exception {
-        DatagramSocket newSocket = new DatagramSocket(9000);
+        int port = 9555;
+        minhaPorta = port;
+        System.out.println("port " + port);
+        DatagramSocket newSocket = new DatagramSocket(port);
         return newSocket;
     }
 
@@ -53,6 +57,7 @@ class UDPServer {
         while (true) {
 
             mensagemRecebida = receberMensagem(serverSocket);
+            System.out.println(" resposta do " + minhaPorta + " -> A mensagem recebida é " + mensagemRecebida);
 
             if (mensagemRecebida.charAt(0) == "0".charAt(0)) {
                 System.out.println("sim");
@@ -60,8 +65,9 @@ class UDPServer {
             } else {
                 System.out.println("hora atual = " + UDPServer.hora);
                 System.out.println("Nova hora = " + mensagemRecebida);
+                responder(serverSocket, "foi otario");
             }
-            
+
         }
         // serverSocket.close(); fechar socket
     }

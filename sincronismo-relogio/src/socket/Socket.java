@@ -15,7 +15,6 @@ import java.net.InetAddress;
  */
 public class Socket {
 
-  
     private static DatagramSocket clientSocket;
     private static String ipSlave;
     private static int portSlave, socketPort;
@@ -23,16 +22,18 @@ public class Socket {
     private static int receivedPort;
     private static InetAddress receivedIp;
 
-    private static DatagramSocket openSocket(int port) throws Exception {
+    protected static DatagramSocket openSocket(int port) throws Exception {
         DatagramSocket newSocket = new DatagramSocket(port);
+        System.out.println("Socket Aberto");
         return newSocket;
     }
 
-    private static void closeSocket() {
+    protected static void closeSocket() {
         Socket.clientSocket.close();
+        System.out.println("Socket Fechado");
     }
 
-        /**
+    /**
      * @return the receivedPort
      */
     public static int getReceivedPort() {
@@ -45,11 +46,12 @@ public class Socket {
     public static InetAddress getReceivedIp() {
         return receivedIp;
     }
-    
+
     /**
-     * envia mensagem 
+     * envia mensagem
+     *
      * @param mensagem String com a mensagem
-     * @throws Exception 
+     * @throws Exception
      */
     public void enviarMensagem(String mensagem) throws Exception {
         InetAddress IPAddress;
@@ -61,6 +63,7 @@ public class Socket {
 
         newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Socket.portSlave);
         Socket.clientSocket.send(newPacket); // enviar mensagem
+        System.out.println("Mensagem Enviada");
     }
 
     public String receberMensagem() throws Exception {
@@ -70,6 +73,7 @@ public class Socket {
 
         receivePacket = new DatagramPacket(receiveData, receiveData.length);
         Socket.clientSocket.receive(receivePacket);
+        System.out.println("Mensagem Recebida");
 
         Socket.receivedIp = receivePacket.getAddress();
         Socket.receivedPort = receivePacket.getPort();
@@ -80,6 +84,7 @@ public class Socket {
 
     /**
      * construtor
+     *
      * @param socketPort valor inteiro da porta que será aberta
      * @param ipSlave String com ip do escravo
      * @param portSlave valor int da porta do escravo
@@ -92,6 +97,7 @@ public class Socket {
         try {
             Socket.clientSocket = openSocket(socketPort);
         } catch (Exception e) {
+            System.out.println(e);
 
         }
     }
