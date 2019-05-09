@@ -13,14 +13,10 @@ public class ThreadSocket extends Socket {
 
     private String mensagem;
 
-    public String getMensagem() {
-        return this.mensagem;
-    }
-
     public ThreadSocket(int socketPort, String ipSlave, int portSlave) {
-        
+
         super(socketPort, ipSlave, portSlave);
-        System.out.println(" a porta do slave é "+ portSlave);
+        System.out.println(" a porta do slave é " + portSlave);
     }
 
     public Runnable criarThreadEnviarMensagem(String mensagem) {

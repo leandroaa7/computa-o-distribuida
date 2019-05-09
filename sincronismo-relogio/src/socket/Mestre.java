@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 class Mestre {
 
-    private static int socketPort = 9500;
+    private static int socketPort = 9505;
     private static ArrayList<String[]> enderecos;
     private static ArrayList<Socket> conexoes = new ArrayList<>();
     private static ArrayList<ThreadSocket> threads = new ArrayList<>();
@@ -21,37 +21,66 @@ class Mestre {
         return clientSocket;
     }
 
-    /*
     private static Socket criarConexao(String ipSlave, int portSlave) {
         Socket clientSocket = new Socket(Mestre.socketPort, ipSlave, portSlave);
         Mestre.socketPort++;
         return clientSocket;
-    }*/
+    }
+
+    private static void criarConexoes() {
+
+        ArrayList<Socket> cn = new ArrayList<>();
+        for (int i = 0; i < Mestre.enderecos.size(); i++) {
+            String[] enderecoSlave = enderecos.get(i);
+
+            
+            Mestre.socketPort++;
+            cn.add(new Socket(Mestre.socketPort, enderecoSlave[0], Integer.parseInt(enderecoSlave[1])));
+        }
+        Mestre.conexoes = cn;
+    }
+
+    public static Runnable criarThreadEnviarMensagem(Socket socket, String mensagem) {
+        Runnable t1 = new Runnable() {
+            public void run() {
+                try {
+                    socket.enviarMensagem(mensagem);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+        };
+        return t1;
+    }
+
+    public static Runnable criarThreadReceberMensagem(Socket socket) {
+        Runnable t1 = () -> {
+            try {
+                socket.receberMensagem();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        };
+        return t1;
+    }
+
+    /*
     private static ThreadSocket criarThreadConexao(String ipSlave, int portSlave) {
         ThreadSocket thSocket = new ThreadSocket(socketPort, ipSlave, portSlave);
         Mestre.socketPort++;
         return thSocket;
     }
 
-    /*
-    private static void criarConexoes() {
-        for (int i = 0; i < Mestre.enderecos.size(); i++) {
-            String[] enderecoSlave = enderecos.get(i);
-            Mestre.conexoes.add(
-                    criarConexao(enderecoSlave[0], Integer.parseInt(enderecoSlave[1]))
-            );
-        }
-    }*/
     private static void criarConexoes() {
         String[] enderecoSlave;
         for (int i = 0; i < Mestre.enderecos.size(); i++) {
-            enderecoSlave = enderecos.get(i);
+            enderecoSlave = Mestre.enderecos.get(i);
             Mestre.threads.add(
                     criarThreadConexao(enderecoSlave[0], Integer.parseInt(enderecoSlave[1]))
             );
         }
     }
-
+     */
     private static ArrayList<String[]> gerarEnderecos() {
 
         String[] endereco2 = {"localhost", "9502"};
@@ -65,15 +94,22 @@ class Mestre {
     }
 
     private static void enviarMensagem(String mensagem) {
-        try {
-            Runnable r;
-            for (int i = 0; i < Mestre.threads.size(); i++) {
+        for (int i = 0; i < Mestre.conexoes.size(); i++) {
+            try {
+                Runnable r, r2;
                 //enviarMensagem(Mestre.conexoes.get(i), "hora");
-                r = Mestre.threads.get(i).criarThreadEnviarMensagem(Integer.toString(i));
+                r = criarThreadEnviarMensagem(Mestre.conexoes.get(0), Integer.toString(i));
                 new Thread(r).start();
+                Thread.sleep(500);
+                r2 = criarThreadEnviarMensagem(Mestre.conexoes.get(1), Integer.toString(i));
+                new Thread(r2).start();
+                Thread.sleep(500);
+                {
+
+                }
+            } catch (Exception e) {
+                System.out.println(e);
             }
-        } catch (Exception e) {
-            System.out.println(e);
         }
     }
 
@@ -81,18 +117,36 @@ class Mestre {
         ArrayList<String> mensagens = new ArrayList<>();
         String mensagem;
         Runnable r;
-        try {
-            for (int i = 0; i < Mestre.threads.size(); i++) {
-                r = Mestre.threads.get(i).criarThreadReceberMensagem();
-                new Thread(r).start();
+        Runnable r2;
+        Socket sk = Mestre.conexoes.get(0);
+        r = criarThreadReceberMensagem(sk);
+        new Thread(r).start();
+
+        r2 = criarThreadReceberMensagem(Mestre.conexoes.get(1));
+        new Thread(r2).start();
+
+        for (int i = 0; i < Mestre.conexoes.size(); i++) {
+            try {
+
+            } catch (Exception e) {
+                System.out.println(e);
             }
+
+        }
+
+        try {
             Thread.sleep(1000);
-            for (int i = 0; i < Mestre.threads.size(); i++) {
-                System.out.println(Mestre.threads.get(i).getMensagem()); //temporary
+        } catch (Exception e) {
+        }
+
+        try {
+            for (int i = 0; i < Mestre.conexoes.size(); i++) {
+                System.out.println(Mestre.conexoes.get(i).getMensagem()); //temporary
                 mensagens.add(
                         Mestre.threads.get(i).getMensagem()
                 );
             }
+
         } catch (Exception e) {
             System.out.println(e);
         }

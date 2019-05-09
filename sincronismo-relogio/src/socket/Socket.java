@@ -16,54 +16,45 @@ import java.net.InetAddress;
 public class Socket {
 
     private static DatagramSocket clientSocket;
-    private static String ipSlave;
+    private static String ipSlave, mensagem;
     private static int portSlave, socketPort;
 
     private static int receivedPort;
     private static InetAddress receivedIp;
 
-    protected static DatagramSocket openSocket(int port) throws Exception {
+    public static DatagramSocket openSocket(int port) throws Exception {
         DatagramSocket newSocket = new DatagramSocket(port);
-        System.out.println("Socket Aberto");
+        System.out.println("Socket Aberto na porta " + port);
         return newSocket;
     }
 
-    protected static void closeSocket() {
+    public static void closeSocket() {
         Socket.clientSocket.close();
         System.out.println("Socket Fechado");
     }
 
-    /**
-     * @return the receivedPort
-     */
     public static int getReceivedPort() {
         return receivedPort;
     }
 
-    /**
-     * @return the receivedIp
-     */
     public static InetAddress getReceivedIp() {
         return receivedIp;
     }
 
-    /**
-     * envia mensagem
-     *
-     * @param mensagem String com a mensagem
-     * @throws Exception
-     */
+    public static String getMensagem() {
+        return mensagem;
+    }
+
     public void enviarMensagem(String mensagem) throws Exception {
         InetAddress IPAddress;
         byte[] sendData = new byte[1024];
         DatagramPacket newPacket;
-
         IPAddress = InetAddress.getByName(Socket.ipSlave);// input ip
         sendData = mensagem.getBytes();// transformar em bytes
 
         newPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Socket.portSlave);
         Socket.clientSocket.send(newPacket); // enviar mensagem
-        System.out.println("Mensagem Enviada");
+        System.out.println("Mensagem Enviada para " + Socket.portSlave);
     }
 
     public String receberMensagem() throws Exception {
@@ -73,22 +64,17 @@ public class Socket {
 
         receivePacket = new DatagramPacket(receiveData, receiveData.length);
         Socket.clientSocket.receive(receivePacket);
-        System.out.println("Mensagem Recebida");
 
         Socket.receivedIp = receivePacket.getAddress();
         Socket.receivedPort = receivePacket.getPort();
 
+        System.out.println("Mensagem Recebida por " + receivedPort);
+
         mensagemRecebida = new String(receivePacket.getData());
+        Socket.mensagem = mensagemRecebida;
         return mensagemRecebida;
     }
 
-    /**
-     * construtor
-     *
-     * @param socketPort valor inteiro da porta que será aberta
-     * @param ipSlave String com ip do escravo
-     * @param portSlave valor int da porta do escravo
-     */
     public Socket(int socketPort, String ipSlave, int portSlave) {
         Socket.socketPort = socketPort;
         Socket.portSlave = portSlave;
