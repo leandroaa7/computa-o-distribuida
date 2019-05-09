@@ -6,9 +6,9 @@ package socket;
 //package javaapplication1;
 import java.net.*;
 
-class UDPServer {
+class Escravo {
     
-    private static String hora = "23:30";
+    private static String hora = "03:00";
     private static InetAddress ipDoMestre;
     private static int portaDoMestre;
     private static int minhaPorta;
@@ -49,8 +49,8 @@ class UDPServer {
         receivePacket = new DatagramPacket(receiveData, receiveData.length);
         serverSocket.receive(receivePacket);
         
-        UDPServer.ipDoMestre = receivePacket.getAddress();
-        UDPServer.portaDoMestre = receivePacket.getPort();
+        Escravo.ipDoMestre = receivePacket.getAddress();
+        Escravo.portaDoMestre = receivePacket.getPort();
         
         mensagemRecebida = new String(receivePacket.getData());
         return mensagemRecebida;
@@ -69,9 +69,9 @@ class UDPServer {
             
             if (mensagemRecebida.charAt(0) == "0".charAt(0)) {
                 System.out.println("sim");
-                responder(serverSocket, UDPServer.hora);
+                responder(serverSocket, Escravo.hora);
             } else {
-                System.out.println("hora atual = " + UDPServer.hora);
+                System.out.println("hora atual = " + Escravo.hora);
                 System.out.println("Nova hora = " + mensagemRecebida);
                 responder(serverSocket, "foi otario");
             }

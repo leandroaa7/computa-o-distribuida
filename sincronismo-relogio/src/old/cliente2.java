@@ -1,8 +1,9 @@
-package socket;
+package old;
 
 /**
  * @author 31616720
  */
+import old.Mensagem;
 import java.net.*;
 
 class UDPClient {

@@ -5,7 +5,6 @@ package old;
  */
 import java.io.*;
 import java.net.*;
-import socket.Mensagem;
 
 class UDPClient2 {
 

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package socket;
+package old;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

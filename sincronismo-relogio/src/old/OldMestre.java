@@ -1,7 +1,6 @@
 package old;
 
 import java.util.ArrayList;
-import socket.Socket;
 
 class Mestre {
 
